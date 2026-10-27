@@ -1,5 +1,5 @@
 {
-  "name": "shelf-backend",
+  "name": "shelf-server",
   "version": "1.0.0",
   "description": "Express + MongoDB REST API for the Shelf book library",
   "main": "server.js",

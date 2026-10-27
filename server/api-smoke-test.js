@@ -1,4 +1,4 @@
-// Run with the backend already started:  npm run test:api
+// Run with the server already started:  npm run test:api
 // Requires Node 18+ (built-in fetch). Creates, reads, updates and deletes one test book.
 const BASE = process.env.API_URL || 'http://localhost:5000/api';
 let failed = 0;
