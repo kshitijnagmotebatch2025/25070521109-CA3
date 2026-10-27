@@ -4,7 +4,10 @@ async function request(path = '', options = {}) {
   let res;
   try {
     res = await fetch(BASE + path, {
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(localStorage.getItem('shelf_token') ? { Authorization: `Bearer ${localStorage.getItem('shelf_token')}` } : {}),
+      },
       ...options,
     });
   } catch {

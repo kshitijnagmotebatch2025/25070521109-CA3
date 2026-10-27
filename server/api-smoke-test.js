@@ -2,6 +2,7 @@
 // Requires Node 18+ (built-in fetch). Creates, reads, updates and deletes one test book.
 const BASE = process.env.API_URL || 'http://localhost:5000/api';
 let failed = 0;
+let token;
 
 function check(name, cond) {
   console.log(`${cond ? 'PASS' : 'FAIL'}  ${name}`);
@@ -10,13 +11,18 @@ function check(name, cond) {
 async function call(method, path, body) {
   const res = await fetch(BASE + path, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: body ? JSON.stringify(body) : undefined,
   });
   return { status: res.status, json: await res.json() };
 }
 
 (async () => {
+  const suffix = Date.now();
+  const account = await call('POST', '/auth/register', { name: 'Smoke User', email: `smoke-${suffix}@example.com`, password: 'password123' });
+  check('POST register -> 201', account.status === 201 && account.json.data.token);
+  token = account.json.data.token;
+
   const bad = await call('POST', '/books', { title: '', author: '' });
   check('POST invalid -> 400', bad.status === 400);
 
