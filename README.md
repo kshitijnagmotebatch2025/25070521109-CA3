@@ -8,8 +8,8 @@ A full-stack reading library. Add books, track status (To Read / Reading / Finis
 project-root/
 ├── README.md
 ├── .gitignore
-├── frontend/   (React + Vite)
-└── backend/    (Express + Mongoose)
+├── client/     (React + Vite)
+└── server/     (Express + Mongoose)
 ```
 
 ## 1. Prerequisites
@@ -20,8 +20,8 @@ project-root/
 
 ## 2. Install
 ```bash
-cd backend && npm install
-cd ../frontend && npm install
+cd server && npm install
+cd ../client && npm install
 ```
 
 ## 3. Database and Compass
@@ -29,11 +29,11 @@ cd ../frontend && npm install
 
 **Atlas:** create a cluster, add a database user, allow your IP under Network Access, and copy the connection string.
 
-**Compass:** open Compass, click *Add new connection*, paste the same URI you put in `backend/.env` (for local: `mongodb://127.0.0.1:27017/shelf`), and connect. After adding a book in the app, open database `shelf` → collection `books` to see the document.
+**Compass:** open Compass, click *Add new connection*, paste the same URI you put in `server/.env` (for local: `mongodb://127.0.0.1:27017/shelf`), and connect. After adding a book in the app, open database `shelf` → collection `books` to see the document.
 
-## 4. Configure `backend/.env`
+## 4. Configure `server/.env`
 ```bash
-cd backend
+cd server
 cp .env.example .env      # Windows: copy .env.example .env
 ```
 Edit `MONGODB_URI` (and `PORT` / `CLIENT_ORIGIN` if needed). Never commit `.env`.
@@ -41,14 +41,14 @@ Edit `MONGODB_URI` (and `PORT` / `CLIENT_ORIGIN` if needed). Never commit `.env`
 ## 5. Run (two terminals)
 ```bash
 # Terminal 1
-cd backend && npm run dev     # or: npm start
+cd server && npm run dev      # or: npm start
 # Terminal 2
-cd frontend && npm run dev
+cd client && npm run dev
 ```
-- Frontend: http://localhost:5173
-- Backend: http://localhost:5000 (health check: http://localhost:5000/api/health)
+- Client: http://localhost:5173
+- Server: http://localhost:5000 (health check: http://localhost:5000/api/health)
 
-The Vite dev server proxies `/api` to port 5000. For a deployed frontend, set `VITE_API_URL` to the backend origin and set `CLIENT_ORIGIN` on the backend.
+The Vite dev server proxies `/api` to port 5000. For a deployed client, set `VITE_API_URL` to the server origin and set `CLIENT_ORIGIN` on the server.
 
 ## 6. API endpoints
 | Method | Path | Purpose |
@@ -65,9 +65,9 @@ Book fields: `title` (required, ≤150), `author` (required, ≤100), `genre`, `
 Responses look like `{ "success": true, "data": ..., "message": "..." }`; errors return `{ "success": false, "message": "..." }` with status 400 (invalid input/ID), 404 (not found) or 500.
 
 ## 7. Testing
-**Automated API smoke test** (backend must be running):
+**Automated API smoke test** (server must be running):
 ```bash
-cd backend && npm run test:api
+cd server && npm run test:api
 ```
 It checks invalid input → 400, create → 201, list/search, get by ID, update, invalid ID → 400, delete, and deleted record → 404.
 
@@ -76,15 +76,15 @@ It checks invalid input → 400, create → 201, list/search, get by ID, update,
 2. Refresh the page → the book is still there.
 3. Edit it → the change shows in Compass. 
 4. Delete it → confirm the dialog; the document disappears from Compass.
-5. Submit the form empty → inline errors appear. Stop the backend → the list shows a retry message.
+5. Submit the form empty → inline errors appear. Stop the server → the list shows a retry message.
 6. Try search, status/genre filters, sorting and the Stats page.
 
 ## 8. Troubleshooting
 | Problem | Fix |
 |---|---|
-| `MONGODB_URI is not set` | Create `backend/.env` from `.env.example` |
+| `MONGODB_URI is not set` | Create `server/.env` from `.env.example` |
 | `ECONNREFUSED 127.0.0.1:27017` | Start local MongoDB, or use an Atlas URI |
 | Atlas auth / timeout errors | Check username, password (URL-encode special characters) and Network Access IP list |
-| UI says "Cannot reach the server" | Start the backend; confirm port 5000 is free |
-| CORS error | Set `CLIENT_ORIGIN` in `backend/.env` to the frontend's exact origin and restart |
-| Port already in use | Change `PORT` in `.env` and the proxy target in `frontend/vite.config.js` |
+| UI says "Cannot reach the server" | Start the server; confirm port 5000 is free |
+| CORS error | Set `CLIENT_ORIGIN` in `server/.env` to the client's exact origin and restart |
+| Port already in use | Change `PORT` in `.env` and the proxy target in `client/vite.config.js` |

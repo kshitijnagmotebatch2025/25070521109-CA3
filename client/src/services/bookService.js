@@ -8,7 +8,7 @@ async function request(path = '', options = {}) {
       ...options,
     });
   } catch {
-    throw new Error('Cannot reach the server. Check that the backend is running on port 5000.');
+    throw new Error('Cannot reach the server. Check that the server is running on port 5000.');
   }
   let body = null;
   try { body = await res.json(); } catch { /* non-JSON response */ }
