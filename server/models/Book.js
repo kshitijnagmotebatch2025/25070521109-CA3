@@ -5,6 +5,7 @@ const STATUSES = ['To Read', 'Reading', 'Finished'];
 
 const bookSchema = new mongoose.Schema(
   {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     title: { type: String, required: [true, 'Title is required'], trim: true, maxlength: [150, 'Title must be 150 characters or fewer'] },
     author: { type: String, required: [true, 'Author is required'], trim: true, maxlength: [100, 'Author must be 100 characters or fewer'] },
     genre: { type: String, enum: { values: GENRES, message: 'Genre must be one of: ' + GENRES.join(', ') }, default: 'Other' },

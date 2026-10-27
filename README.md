@@ -2,7 +2,7 @@
 
 A full-stack reading library. Add books, track status (To Read / Reading / Finished), rate them, search, filter, sort, and view reading stats.
 
-**Data flow:** React → `fetch` → Express REST API → Mongoose → MongoDB
+**Data flow:** React → `fetch` → JWT-authenticated Express REST API → Mongoose → MongoDB
 
 ```text
 project-root/
@@ -36,7 +36,7 @@ cd ../client && npm install
 cd server
 cp .env.example .env      # Windows: copy .env.example .env
 ```
-Edit `MONGODB_URI` (and `PORT` / `CLIENT_ORIGIN` if needed). Never commit `.env`.
+Edit `MONGODB_URI`, `JWT_SECRET` (a long random value), and optionally `PORT` / `CLIENT_ORIGIN`. Never commit `.env`.
 
 ## 5. Run (two terminals)
 ```bash
@@ -54,12 +54,16 @@ The Vite dev server proxies `/api` to port 5000. For a deployed client, set `VIT
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/api/health` | Server check |
-| GET | `/api/books?q=&status=&genre=&sort=` | List, search, filter, sort (`newest`, `oldest`, `title`, `author`, `rating`) |
-| GET | `/api/books/stats` | Totals, averages, counts by status and genre |
-| GET | `/api/books/:id` | One book |
-| POST | `/api/books` | Create |
-| PUT | `/api/books/:id` | Update |
-| DELETE | `/api/books/:id` | Delete |
+| POST | `/api/auth/register` | Create an account and return a JWT |
+| POST | `/api/auth/login` | Log in and return a JWT |
+| GET | `/api/books?q=&status=&genre=&sort=` | List the signed-in user's books |
+| GET | `/api/books/stats` | Stats for the signed-in user's books |
+| GET | `/api/books/:id` | One of the signed-in user's books |
+| POST | `/api/books` | Create a book for the signed-in user |
+| PUT | `/api/books/:id` | Update the signed-in user's book |
+| DELETE | `/api/books/:id` | Delete the signed-in user's book |
+
+Book endpoints require `Authorization: Bearer <token>`. Each book is associated with its creating user, so users cannot access one another's libraries.
 
 Book fields: `title` (required, ≤150), `author` (required, ≤100), `genre`, `status`, `rating` (0–5 integer), `pages` (integer ≥1, optional), `notes` (≤1000).
 Responses look like `{ "success": true, "data": ..., "message": "..." }`; errors return `{ "success": false, "message": "..." }` with status 400 (invalid input/ID), 404 (not found) or 500.
@@ -72,7 +76,7 @@ cd server && npm run test:api
 It checks invalid input → 400, create → 201, list/search, get by ID, update, invalid ID → 400, delete, and deleted record → 404.
 
 **Manual end-to-end check**
-1. Add a book in the UI → it appears in the list and as a document in Compass (`shelf.books`).
+1. Register or log in, then add a book → it appears in the list and as a document in Compass (`shelf.books`).
 2. Refresh the page → the book is still there.
 3. Edit it → the change shows in Compass. 
 4. Delete it → confirm the dialog; the document disappears from Compass.
